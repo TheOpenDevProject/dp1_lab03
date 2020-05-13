@@ -4,47 +4,97 @@ import map.Ocean;
 
 import java.util.concurrent.ThreadLocalRandom;
 
+/**
+ * 
+ * Usually I would put the following into their own files
+ */
+
+/**
+ * Create a reusable positional functionality that can be shared across all Obejcts.
+ */
+public class Position{
+    private int _x; // X-Chordinate
+    private int _y; // Y-Chordinate
+
+    /**
+     * Constructs a default position
+     */
+    public Position(int x, int y){
+        this._x = x;
+        this._y = y;
+    }
+    /**
+     * Gets the X Value for the entities current location
+     */
+    public int getX(){
+        return this._x;
+    }
+
+     /**
+     * Gets the X Value for the entities current location
+     */
+    public int getY(){
+        return this._y;
+    }
+
+    /**
+     * Sets the value of our X-Chord to our new X position
+     */
+    public void setX(int x){
+        this._x = x;
+    }
+
+    /**
+     * Move our X-Pos x spaces
+     */
+    public void moveX(int x){
+        this._x += x;
+    }
+}
+
+ public class Carrier{
+     private Position _position;
+     
+     public Carrier(int x, int y){
+         this._position = new Position(x,y); // Sets the starting location
+     }
+ }
+
 public class PlayerVsCpu {
     private Ocean playerOcean;
     private Ocean cpuOcean;
+    private boolean gameInProgress = true;
+    // All of the previous items here should be contained in their own objects and re-usability should be as close to 100% as you can get
 
     public PlayerVsCpu() {
     }
+    
+    public void displayPlayerTurnCompleteMessage(){
+        System.out.println("Player's turn has been completed");
+    }
 
+
+    public boolean tick(){
+        boolean playersTurn = playersTurn();
+        boolean cpusTurn = cpusTurn();
+
+        // Return if either of these are true
+        return playersTurn || cpusTurn;
+    }
     public boolean startNewGame(){
-        boolean gameInProgress = true;
-        int carrierX = 0;
-        int carrierY = 0;
-        int battleshipX = 1;
-        int battleshipY = 0;
-        int destroyerX = 2;
-        int destroyerY = 0;
-        int submarineX = 3;
-        int submarineY = 0;
-        int patrolBoatX = 4;
-        int patrolBoatY = 0;
+
         cpuOcean = new Ocean(0,0,1,0,2,0,3,0,4,0);
         playerOcean = new Ocean(carrierX, carrierY, battleshipX, battleshipY, destroyerX, destroyerY, submarineX, submarineY, patrolBoatX, patrolBoatY);
-        do{
-            if(playersTurn()){
-                System.out.println("Player's turn has been completed");
-            }else{
-                System.out.println("Player wins");
-                gameInProgress = false;
-                break;
-            }
-
-            if(cpusTurn()){
-                System.out.println("CPU's turn has been completed");
-            }else{
-                System.out.println("CPU wins");
-                gameInProgress = false;
-            }
-        }while(gameInProgress);
-        return true;
+        
+        // Just use a while loop, its syntactically much cleaner
+        while(gameInProgress){
+            gameInProgress = tick(); // Constantly check each cycle is it the game has finished
+        }
+        
     }
 
     private boolean playersTurn(){
+        //Move your Print logic into each of these functions, its relevant to the player / cpu only that way you can logically condense your code
         boolean turnCompleted = false;
         do {
             turnCompleted = checkPlayerGridIfAlreadyFiredShotOnLocation(ThreadLocalRandom.current().nextInt(0, 10), ThreadLocalRandom.current().nextInt(0, 10));
